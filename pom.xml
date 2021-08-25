@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.udacity.jwdnd.course1</groupId>
-    <artifactId>cloudstorage</artifactId>
+    <artifactId>superduperdrive-cloud-storage</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>cloudstorage</name>
+    <name>superduperdrive-cloud-storage</name>
     <description>Final Project for Udacity's Spring Boot Basics course.</description>
 
     <properties>
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>2.1.1</version>
+            <version>2.2.0</version>
         </dependency>
 
         <dependency>
@@ -86,7 +86,7 @@
 		<dependency>
 			<groupId>io.github.bonigarcia</groupId>
 			<artifactId>webdrivermanager</artifactId>
-			<version>3.8.1</version>
+			<version>4.4.3</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
