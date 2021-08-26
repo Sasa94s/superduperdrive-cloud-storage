@@ -1,0 +1,60 @@
+package com.udacity.jwdnd.course1.cloudstorage.controllers;
+
+import com.udacity.jwdnd.course1.cloudstorage.exceptions.ArgNotFoundException;
+import com.udacity.jwdnd.course1.cloudstorage.exceptions.NoRowsAffectedException;
+import com.udacity.jwdnd.course1.cloudstorage.models.Credential;
+import com.udacity.jwdnd.course1.cloudstorage.services.CredentialService;
+import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+@Controller
+@RequestMapping("/home/credential")
+public class CredentialsController {
+
+    private final CredentialService credentialService;
+    private final UserService userService;
+
+    public CredentialsController(CredentialService credentialService, UserService userService) {
+        this.credentialService = credentialService;
+        this.userService = userService;
+    }
+
+    @PostMapping("add")
+    public String add(@ModelAttribute Credential credential, Authentication authentication, RedirectAttributes model) {
+        try {
+            int userId = userService.getUser(authentication.getName()).getUserId();
+            credential.setUserid(userId);
+            credentialService.createCredential(credential);
+        } catch (NoRowsAffectedException | ArgNotFoundException e) {
+            model.addFlashAttribute("resultError", e.getMessage());
+        }
+
+        return "redirect:/home/result";
+    }
+
+    @PostMapping("edit")
+    public String edit(@ModelAttribute Credential credential, RedirectAttributes model) {
+        try {
+            credentialService.updateCredential(credential);
+        } catch (NoRowsAffectedException | ArgNotFoundException e) {
+            model.addFlashAttribute("resultError", e.getMessage());
+        }
+        return "redirect:/home/result";
+    }
+
+    @PostMapping("delete")
+    public String delete(@ModelAttribute("credentialId") Integer credentialId, RedirectAttributes model) {
+        try {
+            credentialService.deleteCredential(credentialId);
+        } catch (ArgNotFoundException | NoRowsAffectedException e) {
+            model.addFlashAttribute("resultError", e.getMessage());
+        }
+        return "redirect:/home/result";
+    }
+}
