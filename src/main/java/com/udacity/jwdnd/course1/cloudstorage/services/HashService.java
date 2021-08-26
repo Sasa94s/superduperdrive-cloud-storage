@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
@@ -27,5 +28,13 @@ public class HashService {
         }
 
         return Base64.getEncoder().encodeToString(hashedValue);
+    }
+
+    public String generateEncodedSalt() {
+        SecureRandom random = new SecureRandom();
+        byte[] saltBytes = new byte[16];
+        random.nextBytes(saltBytes);
+
+        return Base64.getEncoder().encodeToString(saltBytes);
     }
 }
