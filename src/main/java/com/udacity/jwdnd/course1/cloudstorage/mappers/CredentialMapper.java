@@ -11,6 +11,9 @@ public interface CredentialMapper {
     @Select("SELECT * FROM CREDENTIALS")
     List<Credential> getCredentials();
 
+    @Select("SELECT * FROM CREDENTIALS WHERE credentialid = #{credentialId}")
+    Credential getCredential(int credentialId);
+
     @Select("SELECT COUNT(1) AS count FROM CREDENTIALS WHERE credentialid = #{credentialId}")
     @Result(column = "count", javaType = Long.class)
     long checkCredential(int credentialId);

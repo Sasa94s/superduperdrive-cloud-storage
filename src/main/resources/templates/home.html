@@ -161,11 +161,13 @@
                                                 th:credential-url="${credential.url}"
                                                 th:credential-username="${credential.username}"
                                                 th:credential-password="${credential.password}"
+                                                th:credential-decrypted-password="${credential.decryptedPassword}"
                                                 onclick="showCredentialModal({
                                                     'credentialId': this.getAttribute('credential-id'),
                                                     'url': this.getAttribute('credential-url'),
                                                     'username': this.getAttribute('credential-username'),
                                                     'password': this.getAttribute('credential-password'),
+                                                    'decryptedPassword': this.getAttribute('credential-decrypted-password'),
                                                 })"
                                         >
                                             Edit
@@ -250,7 +252,7 @@
                 $('#credential-id').val(credential?.credentialId);
                 $('#credential-url').val(credential?.url);
                 $('#credential-username').val(credential?.username);
-                $('#credential-password').val(credential?.password);
+                $('#credential-password').val(credential?.decryptedPassword);
                 if (credential) {
                     actionUrl = actionUrl + '/edit';
                 } else {
