@@ -21,7 +21,11 @@ public class UserService {
         return userMapper.checkUser(userName) == 1;
     }
 
-    public User getUser(String userName) {
+    public User getUser(String userName) throws ArgNotFoundException {
+        if (!isUsernameAvailable(userName)) {
+            throw new ArgNotFoundException("Username does not exist");
+        }
+
         return userMapper.getUser(userName);
     }
 
@@ -42,7 +46,7 @@ public class UserService {
 
         int rows = userMapper.addUser(user);
         if (rows < 1) {
-            throw new NoRowsAffectedException(String.format("%d affected", rows));
+            throw new NoRowsAffectedException(String.format("%d user(s) created", rows));
         }
 
         return user.getUserId();
