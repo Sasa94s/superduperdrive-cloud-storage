@@ -72,7 +72,9 @@ public class Router {
     }
 
     public LoginPage loginPage() {
-        driver.get(loginUrl);
+        if (!hasSameCurrentUrl(loginUrl)) {
+            driver.get(loginUrl);
+        }
 
         return new LoginPage(driver);
     }
