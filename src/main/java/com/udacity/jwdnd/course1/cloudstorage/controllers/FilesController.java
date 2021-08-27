@@ -9,6 +9,7 @@ import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -22,6 +23,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.net.URI;
 import java.sql.SQLException;
 
 @Controller
@@ -47,6 +49,9 @@ public class FilesController {
         try {
             if (file.getSize() == 0 || file.getOriginalFilename() == null || file.getOriginalFilename().isEmpty()) {
                 throw new ArgNotFoundException("Uploaded file is empty");
+            }
+            if (file.getSize() / 1024 / 1024 > 5) {
+                throw new NoRowsAffectedException("File exceeded limit 5 MB");
             }
             logger.info(String.format("Uploading file %s [%d bytes]", file.getOriginalFilename(), file.getSize()));
             int userId = userService.getUser(authentication.getName()).getUserId();
@@ -86,7 +91,9 @@ public class FilesController {
             model.addFlashAttribute("resultError", "Unexpected error, please try again.");
         }
 
-        return ResponseEntity.badRequest().build();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/home/result"));
+        return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
     }
 
     @PostMapping("delete")
