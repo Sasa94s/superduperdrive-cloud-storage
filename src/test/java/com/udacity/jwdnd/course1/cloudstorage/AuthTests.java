@@ -1,11 +1,13 @@
 package com.udacity.jwdnd.course1.cloudstorage;
 
 import com.udacity.jwdnd.course1.cloudstorage.models.User;
+import com.udacity.jwdnd.course1.cloudstorage.pages.HomePage;
+import com.udacity.jwdnd.course1.cloudstorage.pages.LoginPage;
+import com.udacity.jwdnd.course1.cloudstorage.core.Router;
+import com.udacity.jwdnd.course1.cloudstorage.pages.SignupPage;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -17,6 +19,7 @@ class AuthTests {
 	private int port;
 
 	private WebDriver driver;
+	private Router router;
 
 	@BeforeAll
 	static void beforeAll() {
@@ -26,6 +29,7 @@ class AuthTests {
 	@BeforeEach
 	public void beforeEach() {
 		this.driver = new ChromeDriver();
+		router = Router.getInstance(driver, port);
 	}
 
 	@AfterEach
@@ -37,65 +41,49 @@ class AuthTests {
 
 	@Test
 	public void getUnauthorizedPage() {
-		driver.get("http://localhost:" + this.port + "/home");
+		router.homePage();
 		String defaultRedirectUrl = "http://localhost:" + this.port + "/login";
 		Assertions.assertEquals(defaultRedirectUrl, driver.getCurrentUrl());
 	}
 
 	@Test
 	public void getLoginPage() {
-		driver.get("http://localhost:" + this.port + "/login");
+		LoginPage loginPage = router.loginPage();
 		Assertions.assertEquals("Login", driver.getTitle());
-		String header = driver.findElement(By.xpath("/html/body/div/h1")).getText();
-		Assertions.assertEquals("Login", header);
+		Assertions.assertEquals("Login", loginPage.mainHeading.getText());
 	}
 
 	@Test
 	public void getSignupPage() {
 		driver.get("http://localhost:" + this.port + "/signup");
+		SignupPage signupPage = router.signupPage();
 		Assertions.assertEquals("Sign Up", driver.getTitle());
-		String header = driver.findElement(By.xpath("/html/body/div/h1")).getText();
-		Assertions.assertEquals("Sign Up", header);
-	}
-
-	private void enterSignupInfo(User user) {
-		WebElement inFirstName = driver.findElement(By.xpath("//*[@id=\"inputFirstName\"]"));
-		WebElement inLastName = driver.findElement(By.xpath("//*[@id=\"inputLastName\"]"));
-		WebElement inUsername = driver.findElement(By.xpath("//*[@id=\"inputUsername\"]"));
-		WebElement inPassword = driver.findElement(By.xpath("//*[@id=\"inputPassword\"]"));
-		WebElement btnSignup = driver.findElement(By.xpath("/html/body/div/form/button"));
-		inFirstName.sendKeys(user.getFirstName());
-		inLastName.sendKeys(user.getLastName());
-		inUsername.sendKeys(user.getUsername());
-		inPassword.sendKeys(user.getPassword());
-		btnSignup.click();
-
-		WebElement message = driver.findElement(By.xpath("/html/body/div/form/div[1]"));
-		Assertions.assertTrue(message.getText().contains("You successfully signed up!"));
-	}
-
-	private void enterLoginInfo(User user) {
-		WebElement inUsername = driver.findElement(By.xpath("//*[@id=\"inputUsername\"]"));
-		WebElement inPassword = driver.findElement(By.xpath("//*[@id=\"inputPassword\"]"));
-		WebElement btnLogin = driver.findElement(By.xpath("/html/body/div/form/button"));
-		inUsername.sendKeys(user.getUsername());
-		inPassword.sendKeys(user.getPassword());
-		btnLogin.click();
-		Assertions.assertEquals(driver.getCurrentUrl(), "http://localhost:" + this.port + "/home");
+		Assertions.assertEquals("Sign Up", signupPage.mainHeading.getText());
 	}
 
 	@Test
 	public void SignupLoginLogoutUnauthorizedAccess() {
 		getSignupPage();
-		User user = new User(null, "test_account", null, "testPa$$w0rd", "Mostafa", "Elsheikh");
-		enterSignupInfo(user);
-		getLoginPage();
-		enterLoginInfo(user);
+		SignupPage signupPage = router.signupPage();
+		User user = new User(null, "test_account", null,
+				"testPa$$w0rd", "Mostafa", "Elsheikh");
+		signupPage.signup(
+				user.getFirstName(),
+				user.getLastName(),
+				user.getUsername(),
+				user.getPassword()
+		);
+		Assertions.assertTrue(signupPage.signupStatus(), signupPage.errorAlert.getText());
+		LoginPage loginPage = router.loginPage();
+		loginPage.login(
+				user.getUsername(),
+				user.getPassword()
+		);
+		HomePage homePage = router.homePage();
+		homePage.logout();
 
-		WebElement btnLogout = driver.findElement(By.xpath("//*[@id=\"logoutDiv\"]/form/button"));
-		btnLogout.click();
-
-		getUnauthorizedPage();
+		String defaultRedirectUrl = "http://localhost:" + this.port + "/login";
+		Assertions.assertEquals(defaultRedirectUrl, driver.getCurrentUrl());
 	}
 
 }

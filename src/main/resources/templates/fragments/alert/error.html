@@ -2,8 +2,8 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
 <body>
 <div class="alert alert-danger fill-parent">
-    <h1 class="display-5">Error</h1>
-    <div th:text="${resultError}">Example Error Message</div>
+    <h1 class="display-5" id="result-head">Error</h1>
+    <div th:text="${resultError}" id="result-body">Example Error Message</div>
     <span>Your changes were not saved. Click <a th:href="@{/home}">here</a> to continue.</span>
 </div>
 </body>

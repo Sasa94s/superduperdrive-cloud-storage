@@ -1,0 +1,55 @@
+package com.udacity.jwdnd.course1.cloudstorage.pages;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+
+public class SignupPage {
+
+    @FindBy(xpath = "/html/body/div/h1")
+    public WebElement mainHeading;
+
+    @FindBy(xpath = "//*[@id=\"inputFirstName\"]")
+    private WebElement firstNameField;
+
+    @FindBy(xpath = "//*[@id=\"inputLastName\"]")
+    private WebElement lastNameField;
+
+    @FindBy(xpath = "//*[@id=\"inputUsername\"]")
+    private WebElement usernameField;
+
+    @FindBy(xpath = "//*[@id=\"inputPassword\"]")
+    private WebElement passwordField;
+
+    @FindBy(xpath = "/html/body/div/form/button")
+    private WebElement signupButton;
+
+    @FindBy(xpath = "/html/body/div/form/div[1]")
+    public WebElement successAlert;
+
+    @FindBy(xpath = "/html/body/div/form/div[1]/span")
+    public WebElement errorAlert;
+
+    public SignupPage(WebDriver driver) {
+        PageFactory.initElements(driver, this);
+    }
+
+    public void signup(
+            String firstName,
+            String lastName,
+            String username,
+            String password
+    ) {
+        firstNameField.sendKeys(firstName);
+        lastNameField.sendKeys(lastName);
+        usernameField.sendKeys(username);
+        passwordField.sendKeys(password);
+        signupButton.click();
+    }
+
+    public boolean signupStatus() {
+        return successAlert.getText().contains("You successfully signed up!")
+                && !errorAlert.isDisplayed();
+    }
+}

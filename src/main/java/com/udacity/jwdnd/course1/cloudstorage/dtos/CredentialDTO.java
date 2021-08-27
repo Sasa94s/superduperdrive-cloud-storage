@@ -3,9 +3,17 @@ package com.udacity.jwdnd.course1.cloudstorage.dtos;
 import com.udacity.jwdnd.course1.cloudstorage.models.Credential;
 
 public class CredentialDTO extends Credential {
-    public String decryptedPassword;
+    private String decryptedPassword;
 
-    public CredentialDTO(Integer credentialId, String url, String username, String key, String password, Integer userid, String decryptedPassword) {
+    public CredentialDTO(
+            Integer credentialId,
+            String url,
+            String username,
+            String key,
+            String password,
+            Integer userid,
+            String decryptedPassword
+    ) {
         super(credentialId, url, username, key, password, userid);
         this.decryptedPassword = decryptedPassword;
     }
