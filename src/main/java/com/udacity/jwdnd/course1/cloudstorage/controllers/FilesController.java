@@ -44,6 +44,10 @@ public class FilesController {
     ) {
         String uploadErrorMessage = null;
         try {
+            if (file.getSize() == 0 || file.getOriginalFilename() == null || file.getOriginalFilename().isEmpty()) {
+                throw new ArgNotFoundException("Uploaded file is empty");
+            }
+            logger.info(String.format("Uploading file %s [%d bytes]", file.getOriginalFilename(), file.getSize()));
             int userId = userService.getUser(authentication.getName()).getUserId();
             FileModel fileModel = new FileModel(null, file.getOriginalFilename(), file.getContentType(),
                     String.format("%d KB", file.getSize() / 1024), userId, file.getInputStream().readAllBytes());
