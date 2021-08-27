@@ -22,6 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 @Controller
 @RequestMapping("/home/file")
@@ -54,7 +55,7 @@ public class FilesController {
             fileService.saveFile(fileModel);
         } catch (ArgNotFoundException | ArgAlreadyExistsException | NoRowsAffectedException e) {
             uploadErrorMessage = e.getMessage();
-        } catch (IOException e) {
+        } catch (IOException | SQLException e) {
             uploadErrorMessage = "Unexpected error, please try again.";
             logger.error("File Upload Error", e);
         }
@@ -64,7 +65,11 @@ public class FilesController {
     }
 
     @PostMapping("view")
-    public ResponseEntity<StreamingResponseBody> view(@ModelAttribute("fileName") String fileName, Authentication authentication) {
+    public ResponseEntity<StreamingResponseBody> view(
+            @ModelAttribute("fileName") String fileName,
+            Authentication authentication,
+            RedirectAttributes model
+    ) {
         try {
             int userId = userService.getUser(authentication.getName()).getUserId();
             FileModel file = fileService.getFile(fileName, userId);
@@ -75,20 +80,30 @@ public class FilesController {
                     .body(responseBody);
         } catch (ArgNotFoundException e) {
             logger.error(e.getMessage(), e);
+            model.addFlashAttribute("resultError", e.getMessage());
         } catch (Exception e) {
             logger.error("Unexpected error", e);
+            model.addFlashAttribute("resultError", "Unexpected error, please try again.");
         }
 
         return ResponseEntity.badRequest().build();
     }
 
     @PostMapping("delete")
-    public String delete(@ModelAttribute("fileName") String fileName, Authentication authentication) {
+    public String delete(
+            @ModelAttribute("fileName") String fileName,
+            Authentication authentication,
+            RedirectAttributes model
+    ) {
         try {
             int userId = userService.getUser(authentication.getName()).getUserId();
             fileService.deleteFile(fileName, userId);
         } catch (ArgNotFoundException | NoRowsAffectedException e) {
             logger.error("Unable to delete file", e);
+            model.addFlashAttribute("resultError", e.getMessage());
+        } catch (SQLException e) {
+            logger.error("Unexpected error", e);
+            model.addFlashAttribute("resultError", "Unexpected error, please try again.");
         }
 
         return "redirect:/home/result";

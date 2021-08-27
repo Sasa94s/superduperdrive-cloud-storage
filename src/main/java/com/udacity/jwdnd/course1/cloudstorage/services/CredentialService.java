@@ -7,6 +7,7 @@ import com.udacity.jwdnd.course1.cloudstorage.mappers.CredentialMapper;
 import com.udacity.jwdnd.course1.cloudstorage.models.Credential;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,11 +21,11 @@ public class CredentialService {
         this.encryptionService = encryptionService;
     }
 
-    public boolean isCredentialIdFound(int credentialId, int userId) {
+    public boolean isCredentialIdFound(int credentialId, int userId) throws SQLException {
         return credentialMapper.checkCredential(credentialId, userId) == 1;
     }
 
-    public List<CredentialDTO> getCredentials(int userId) {
+    public List<CredentialDTO> getCredentials(int userId) throws SQLException {
         return credentialMapper.getCredentials(userId).stream()
                 .map(credential -> {
                     String decryptedPassword = encryptionService.decryptValue(credential.getPassword(), credential.getKey());
@@ -42,7 +43,7 @@ public class CredentialService {
                 .collect(Collectors.toList());
     }
 
-    public int createCredential(Credential credential) throws NoRowsAffectedException {
+    public int createCredential(Credential credential) throws NoRowsAffectedException, SQLException {
         credential.setKey(encryptionService.generateEncodedKey());
         String encryptedPassword = encryptionService.encryptValue(credential.getPassword(), credential.getKey());
         credential.setPassword(encryptedPassword);
@@ -54,7 +55,7 @@ public class CredentialService {
         return credential.getCredentialId();
     }
 
-    public int updateCredential(Credential credential) throws NoRowsAffectedException, ArgNotFoundException {
+    public int updateCredential(Credential credential) throws NoRowsAffectedException, ArgNotFoundException, SQLException {
         if (!isCredentialIdFound(credential.getCredentialId(), credential.getUserId())) {
             throw new ArgNotFoundException(String.format("%s credential not found", credential.getCredentialId()));
         }
@@ -73,7 +74,7 @@ public class CredentialService {
         return rows;
     }
 
-    public void deleteCredential(int credentialId, int userId) throws ArgNotFoundException, NoRowsAffectedException {
+    public void deleteCredential(int credentialId, int userId) throws ArgNotFoundException, NoRowsAffectedException, SQLException {
         if (!isCredentialIdFound(credentialId, userId)) {
             throw new ArgNotFoundException(String.format("%s credential not found", credentialId));
         }

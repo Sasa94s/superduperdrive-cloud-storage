@@ -7,6 +7,8 @@ import com.udacity.jwdnd.course1.cloudstorage.mappers.UserMapper;
 import com.udacity.jwdnd.course1.cloudstorage.models.User;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
+
 @Service
 public class UserService {
     private final UserMapper userMapper;
@@ -17,11 +19,11 @@ public class UserService {
         this.hashService = hashService;
     }
 
-    public boolean isUsernameAvailable(String userName) {
+    public boolean isUsernameAvailable(String userName) throws SQLException {
         return userMapper.checkUser(userName) == 1;
     }
 
-    public User getUser(String userName) throws ArgNotFoundException {
+    public User getUser(String userName) throws ArgNotFoundException, SQLException {
         if (!isUsernameAvailable(userName)) {
             throw new ArgNotFoundException("Username does not exist");
         }
@@ -29,7 +31,7 @@ public class UserService {
         return userMapper.getUser(userName);
     }
 
-    public int createUser(User user) throws ArgAlreadyExistsException, NoRowsAffectedException {
+    public int createUser(User user) throws ArgAlreadyExistsException, NoRowsAffectedException, SQLException {
         if (user == null) {
             throw new IllegalArgumentException("User data is empty");
         }
@@ -52,7 +54,7 @@ public class UserService {
         return user.getUserId();
     }
 
-    public boolean checkPassword(String userName, String password) throws ArgNotFoundException {
+    public boolean checkPassword(String userName, String password) throws ArgNotFoundException, SQLException {
         if (!isUsernameAvailable(userName)) {
             throw new ArgNotFoundException("Username does not exist");
         }

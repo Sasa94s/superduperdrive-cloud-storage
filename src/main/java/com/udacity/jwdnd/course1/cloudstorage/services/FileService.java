@@ -7,6 +7,7 @@ import com.udacity.jwdnd.course1.cloudstorage.mappers.FileMapper;
 import com.udacity.jwdnd.course1.cloudstorage.models.FileModel;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @Service
@@ -18,11 +19,11 @@ public class FileService {
         this.fileMapper = fileMapper;
     }
 
-    public boolean isFileNameFound(String fileName, int userId) {
+    public boolean isFileNameFound(String fileName, int userId) throws SQLException {
         return fileMapper.checkFile(fileName, userId) == 1;
     }
 
-    public int saveFile(FileModel file) throws ArgAlreadyExistsException, NoRowsAffectedException {
+    public int saveFile(FileModel file) throws ArgAlreadyExistsException, NoRowsAffectedException, SQLException {
         if (isFileNameFound(file.getFileName(), file.getUserId())) {
             throw new ArgAlreadyExistsException(String.format("%s file already exists", file.getFileName()));
         }
@@ -35,11 +36,11 @@ public class FileService {
         return file.getFileId();
     }
 
-    public List<FileModel> getFiles(int userId) {
+    public List<FileModel> getFiles(int userId) throws SQLException {
         return fileMapper.getFiles(userId);
     }
 
-    public FileModel getFile(String fileName, int userId) throws ArgNotFoundException {
+    public FileModel getFile(String fileName, int userId) throws ArgNotFoundException, SQLException {
         if (!isFileNameFound(fileName, userId)) {
             throw new ArgNotFoundException(String.format("%s file not found", fileName));
         }
@@ -47,7 +48,7 @@ public class FileService {
         return fileMapper.getFile(fileName, userId);
     }
 
-    public void deleteFile(String fileName, int userId) throws ArgNotFoundException, NoRowsAffectedException {
+    public void deleteFile(String fileName, int userId) throws ArgNotFoundException, NoRowsAffectedException, SQLException {
         if (!isFileNameFound(fileName, userId)) {
             throw new ArgNotFoundException(String.format("%s file not found", fileName));
         }

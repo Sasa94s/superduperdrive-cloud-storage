@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.sql.SQLException;
+
 @Controller
 @RequestMapping("/signup")
 public class SignupController {
@@ -47,7 +49,7 @@ public class SignupController {
         } catch (ArgAlreadyExistsException e) {
             signupErrorMessage = e.getMessage();
             logger.error(e.getMessage());
-        } catch (NoRowsAffectedException e) {
+        } catch (NoRowsAffectedException | SQLException e) {
             signupErrorMessage = "Unable to create user, please try again.";
             logger.error(e.getMessage());
         } finally {

@@ -8,17 +8,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 @Service
 public class AuthenticationService implements AuthenticationProvider {
 
     private final UserService userService;
-    private final HashService hashService;
 
     public AuthenticationService(UserService userService, HashService hashService) {
         this.userService = userService;
-        this.hashService = hashService;
     }
 
     @Override
@@ -30,7 +29,7 @@ public class AuthenticationService implements AuthenticationProvider {
             if (userService.checkPassword(userName, password)) {
                 return new UsernamePasswordAuthenticationToken(userName, password, new ArrayList<>());
             }
-        } catch (ArgNotFoundException e) {
+        } catch (ArgNotFoundException | SQLException e) {
             throw new InvalidUserNameException(e.getMessage());
         }
 

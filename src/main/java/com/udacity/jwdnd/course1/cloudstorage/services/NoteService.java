@@ -7,6 +7,7 @@ import com.udacity.jwdnd.course1.cloudstorage.mappers.NoteMapper;
 import com.udacity.jwdnd.course1.cloudstorage.models.Note;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @Service
@@ -18,11 +19,11 @@ public class NoteService {
         this.noteMapper = noteMapper;
     }
 
-    public boolean isNoteIdFound(int noteId, int userId) {
+    public boolean isNoteIdFound(int noteId, int userId) throws SQLException {
         return noteMapper.checkNote(noteId, userId) == 1;
     }
 
-    public int createNote(Note note) throws ArgAlreadyExistsException, NoRowsAffectedException {
+    public int createNote(Note note) throws ArgAlreadyExistsException, NoRowsAffectedException, SQLException {
         int rows = noteMapper.createNote(note);
         if (rows < 1) {
             throw new NoRowsAffectedException(String.format("%d note(s) created", rows));
@@ -31,11 +32,11 @@ public class NoteService {
         return note.getNoteId();
     }
 
-    public List<Note> getNotes(int userId) {
+    public List<Note> getNotes(int userId) throws SQLException {
         return noteMapper.getNotes(userId);
     }
 
-    public Note getNote(int noteId, int userId) throws ArgNotFoundException {
+    public Note getNote(int noteId, int userId) throws ArgNotFoundException, SQLException {
         if (!isNoteIdFound(noteId, userId)) {
             throw new ArgNotFoundException(String.format("%s note not found", noteId));
         }
@@ -43,7 +44,7 @@ public class NoteService {
         return noteMapper.getNote(noteId, userId);
     }
 
-    public int editNote(Note note) throws NoRowsAffectedException {
+    public int editNote(Note note) throws NoRowsAffectedException, SQLException {
         int rows = noteMapper.editNote(note);
         if (rows < 1) {
             throw new NoRowsAffectedException(String.format("%d note(s) modified", rows));
@@ -52,7 +53,7 @@ public class NoteService {
         return rows;
     }
 
-    public void deleteNote(int noteId, int userId) throws ArgNotFoundException, NoRowsAffectedException {
+    public void deleteNote(int noteId, int userId) throws ArgNotFoundException, NoRowsAffectedException, SQLException {
         if (!isNoteIdFound(noteId, userId)) {
             throw new ArgNotFoundException(String.format("%s note not found", noteId));
         }
