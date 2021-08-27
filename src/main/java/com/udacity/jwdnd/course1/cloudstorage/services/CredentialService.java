@@ -20,12 +20,12 @@ public class CredentialService {
         this.encryptionService = encryptionService;
     }
 
-    public boolean isCredentialIdFound(int credentialId) {
-        return credentialMapper.checkCredential(credentialId) == 1;
+    public boolean isCredentialIdFound(int credentialId, int userId) {
+        return credentialMapper.checkCredential(credentialId, userId) == 1;
     }
 
-    public List<CredentialDTO> getCredentials() {
-        return credentialMapper.getCredentials().stream()
+    public List<CredentialDTO> getCredentials(int userId) {
+        return credentialMapper.getCredentials(userId).stream()
                 .map(credential -> {
                     String decryptedPassword = encryptionService.decryptValue(credential.getPassword(), credential.getKey());
 
@@ -35,7 +35,7 @@ public class CredentialService {
                             credential.getUsername(),
                             credential.getKey(),
                             credential.getPassword(),
-                            credential.getUserid(),
+                            credential.getUserId(),
                             decryptedPassword
                     );
                 })
@@ -55,11 +55,11 @@ public class CredentialService {
     }
 
     public int updateCredential(Credential credential) throws NoRowsAffectedException, ArgNotFoundException {
-        if (!isCredentialIdFound(credential.getCredentialId())) {
+        if (!isCredentialIdFound(credential.getCredentialId(), credential.getUserId())) {
             throw new ArgNotFoundException(String.format("%s credential not found", credential.getCredentialId()));
         }
 
-        Credential storedCredential = credentialMapper.getCredential(credential.getCredentialId());
+        Credential storedCredential = credentialMapper.getCredential(credential.getCredentialId(), credential.getUserId());
         if (!credential.getPassword().equals(storedCredential.getPassword())) {
             credential.setKey(encryptionService.generateEncodedKey());
             String newPassword = encryptionService.encryptValue(credential.getPassword(), credential.getKey());
@@ -73,12 +73,12 @@ public class CredentialService {
         return rows;
     }
 
-    public void deleteCredential(int credentialId) throws ArgNotFoundException, NoRowsAffectedException {
-        if (!isCredentialIdFound(credentialId)) {
+    public void deleteCredential(int credentialId, int userId) throws ArgNotFoundException, NoRowsAffectedException {
+        if (!isCredentialIdFound(credentialId, userId)) {
             throw new ArgNotFoundException(String.format("%s credential not found", credentialId));
         }
 
-        if (!credentialMapper.deleteCredential(credentialId)) {
+        if (!credentialMapper.deleteCredential(credentialId, userId)) {
             throw new NoRowsAffectedException("Failed to delete credential");
         }
     }

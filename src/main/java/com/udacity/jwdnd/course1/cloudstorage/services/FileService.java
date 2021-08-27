@@ -18,12 +18,12 @@ public class FileService {
         this.fileMapper = fileMapper;
     }
 
-    public boolean isFileNameFound(String fileName) {
-        return fileMapper.checkFile(fileName) == 1;
+    public boolean isFileNameFound(String fileName, int userId) {
+        return fileMapper.checkFile(fileName, userId) == 1;
     }
 
     public int saveFile(FileModel file) throws ArgAlreadyExistsException, NoRowsAffectedException {
-        if (isFileNameFound(file.getFileName())) {
+        if (isFileNameFound(file.getFileName(), file.getUserId())) {
             throw new ArgAlreadyExistsException(String.format("%s file already exists", file.getFileName()));
         }
 
@@ -35,24 +35,24 @@ public class FileService {
         return file.getFileId();
     }
 
-    public List<FileModel> getFiles() {
-        return fileMapper.getFiles();
+    public List<FileModel> getFiles(int userId) {
+        return fileMapper.getFiles(userId);
     }
 
-    public FileModel getFile(String fileName) throws ArgNotFoundException {
-        if (!isFileNameFound(fileName)) {
+    public FileModel getFile(String fileName, int userId) throws ArgNotFoundException {
+        if (!isFileNameFound(fileName, userId)) {
             throw new ArgNotFoundException(String.format("%s file not found", fileName));
         }
 
-        return fileMapper.getFile(fileName);
+        return fileMapper.getFile(fileName, userId);
     }
 
-    public void deleteFile(String fileName) throws ArgNotFoundException, NoRowsAffectedException {
-        if (!isFileNameFound(fileName)) {
+    public void deleteFile(String fileName, int userId) throws ArgNotFoundException, NoRowsAffectedException {
+        if (!isFileNameFound(fileName, userId)) {
             throw new ArgNotFoundException(String.format("%s file not found", fileName));
         }
 
-        if (!fileMapper.deleteFile(fileName)) {
+        if (!fileMapper.deleteFile(fileName, userId)) {
             throw new NoRowsAffectedException("Failed to delete file");
         }
     }

@@ -18,8 +18,8 @@ public class NoteService {
         this.noteMapper = noteMapper;
     }
 
-    public boolean isNoteIdFound(int noteId) {
-        return noteMapper.checkNote(noteId) == 1;
+    public boolean isNoteIdFound(int noteId, int userId) {
+        return noteMapper.checkNote(noteId, userId) == 1;
     }
 
     public int createNote(Note note) throws ArgAlreadyExistsException, NoRowsAffectedException {
@@ -31,16 +31,16 @@ public class NoteService {
         return note.getNoteId();
     }
 
-    public List<Note> getNotes() {
-        return noteMapper.getNotes();
+    public List<Note> getNotes(int userId) {
+        return noteMapper.getNotes(userId);
     }
 
-    public Note getNote(int noteId) throws ArgNotFoundException {
-        if (!isNoteIdFound(noteId)) {
+    public Note getNote(int noteId, int userId) throws ArgNotFoundException {
+        if (!isNoteIdFound(noteId, userId)) {
             throw new ArgNotFoundException(String.format("%s note not found", noteId));
         }
 
-        return noteMapper.getNote(noteId);
+        return noteMapper.getNote(noteId, userId);
     }
 
     public int editNote(Note note) throws NoRowsAffectedException {
@@ -52,12 +52,12 @@ public class NoteService {
         return rows;
     }
 
-    public void deleteNote(int noteId) throws ArgNotFoundException, NoRowsAffectedException {
-        if (!isNoteIdFound(noteId)) {
+    public void deleteNote(int noteId, int userId) throws ArgNotFoundException, NoRowsAffectedException {
+        if (!isNoteIdFound(noteId, userId)) {
             throw new ArgNotFoundException(String.format("%s note not found", noteId));
         }
 
-        if (!noteMapper.deleteNote(noteId)) {
+        if (!noteMapper.deleteNote(noteId, userId)) {
             throw new NoRowsAffectedException("Failed to delete note");
         }
     }

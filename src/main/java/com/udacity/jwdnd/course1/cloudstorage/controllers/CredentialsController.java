@@ -7,7 +7,6 @@ import com.udacity.jwdnd.course1.cloudstorage.services.CredentialService;
 import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +28,8 @@ public class CredentialsController {
     public String add(@ModelAttribute Credential credential, Authentication authentication, RedirectAttributes model) {
         try {
             int userId = userService.getUser(authentication.getName()).getUserId();
-            credential.setUserid(userId);
+            System.out.println("userId:"+userId);
+            credential.setUserId(userId);
             credentialService.createCredential(credential);
         } catch (NoRowsAffectedException | ArgNotFoundException e) {
             model.addFlashAttribute("resultError", e.getMessage());
@@ -39,8 +39,10 @@ public class CredentialsController {
     }
 
     @PostMapping("edit")
-    public String edit(@ModelAttribute Credential credential, RedirectAttributes model) {
+    public String edit(@ModelAttribute Credential credential, Authentication authentication, RedirectAttributes model) {
         try {
+            int userId = userService.getUser(authentication.getName()).getUserId();
+            credential.setUserId(userId);
             credentialService.updateCredential(credential);
         } catch (NoRowsAffectedException | ArgNotFoundException e) {
             model.addFlashAttribute("resultError", e.getMessage());
@@ -49,9 +51,10 @@ public class CredentialsController {
     }
 
     @PostMapping("delete")
-    public String delete(@ModelAttribute("credentialId") Integer credentialId, RedirectAttributes model) {
+    public String delete(@ModelAttribute("credentialId") Integer credentialId, Authentication authentication, RedirectAttributes model) {
         try {
-            credentialService.deleteCredential(credentialId);
+            int userId = userService.getUser(authentication.getName()).getUserId();
+            credentialService.deleteCredential(credentialId, userId);
         } catch (ArgNotFoundException | NoRowsAffectedException e) {
             model.addFlashAttribute("resultError", e.getMessage());
         }

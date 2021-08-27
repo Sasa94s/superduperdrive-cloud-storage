@@ -39,19 +39,22 @@ public class NotesController {
     }
 
     @PostMapping("edit")
-    public String edit(@ModelAttribute Note note, RedirectAttributes model) {
+    public String edit(@ModelAttribute Note note, Authentication authentication, RedirectAttributes model) {
         try {
+            int userId = userService.getUser(authentication.getName()).getUserId();
+            note.setUserId(userId);
             noteService.editNote(note);
-        } catch (NoRowsAffectedException e) {
+        } catch (NoRowsAffectedException | ArgNotFoundException e) {
             model.addFlashAttribute("resultError", e.getMessage());
         }
         return "redirect:/home/result";
     }
 
     @PostMapping("delete")
-    public String delete(@ModelAttribute("noteId") Integer noteId, RedirectAttributes model) {
+    public String delete(@ModelAttribute("noteId") Integer noteId, Authentication authentication, RedirectAttributes model) {
         try {
-            noteService.deleteNote(noteId);
+            int userId = userService.getUser(authentication.getName()).getUserId();
+            noteService.deleteNote(noteId, userId);
         } catch (ArgNotFoundException | NoRowsAffectedException e) {
             model.addFlashAttribute("resultError", e.getMessage());
         }

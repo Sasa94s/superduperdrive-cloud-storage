@@ -13,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,12 +60,11 @@ public class FilesController {
     }
 
     @PostMapping("view")
-    public ResponseEntity<StreamingResponseBody> view(@ModelAttribute("fileName") String fileName) {
+    public ResponseEntity<StreamingResponseBody> view(@ModelAttribute("fileName") String fileName, Authentication authentication) {
         try {
-            FileModel file = fileService.getFile(fileName);
-            StreamingResponseBody responseBody = outputStream -> {
-                outputStream.write(file.getFileData());
-            };
+            int userId = userService.getUser(authentication.getName()).getUserId();
+            FileModel file = fileService.getFile(fileName, userId);
+            StreamingResponseBody responseBody = outputStream -> outputStream.write(file.getFileData());
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment;filename=%s", fileName))
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -81,9 +79,10 @@ public class FilesController {
     }
 
     @PostMapping("delete")
-    public String delete(@ModelAttribute("fileName") String fileName) {
+    public String delete(@ModelAttribute("fileName") String fileName, Authentication authentication) {
         try {
-            fileService.deleteFile(fileName);
+            int userId = userService.getUser(authentication.getName()).getUserId();
+            fileService.deleteFile(fileName, userId);
         } catch (ArgNotFoundException | NoRowsAffectedException e) {
             logger.error("Unable to delete file", e);
         }

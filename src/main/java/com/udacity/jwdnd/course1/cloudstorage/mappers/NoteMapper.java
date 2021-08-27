@@ -8,15 +8,15 @@ import java.util.List;
 @Mapper
 public interface NoteMapper {
 
-    @Select("SELECT * FROM NOTES")
-    List<Note> getNotes();
+    @Select("SELECT * FROM NOTES WHERE userid = #{userId}")
+    List<Note> getNotes(int userId);
 
-    @Select("SELECT * FROM NOTES WHERE noteid = #{noteId}")
-    Note getNote(int noteId);
+    @Select("SELECT * FROM NOTES WHERE noteid = #{noteId} AND userid = #{userId}")
+    Note getNote(int noteId, int userId);
 
-    @Select("SELECT COUNT(1) AS count FROM NOTES WHERE noteid = #{noteId}")
+    @Select("SELECT COUNT(1) AS count FROM NOTES WHERE noteid = #{noteId} AND userid = #{userId}")
     @Result(column = "count", javaType = Long.class)
-    long checkNote(int noteId);
+    long checkNote(int noteId, int userId);
 
     @Insert("INSERT INTO NOTES (notetitle, notedescription, userid)" +
             "VALUES (#{noteTitle}, #{noteDescription}, #{userId})")
@@ -24,10 +24,10 @@ public interface NoteMapper {
     int createNote(Note note);
 
     @Update("UPDATE NOTES SET notetitle = #{noteTitle}, notedescription = #{noteDescription}" +
-            "WHERE noteid = #{noteId}")
+            "WHERE noteid = #{noteId} AND userid = #{userId}")
     int editNote(Note note);
 
-    @Delete("DELETE FROM NOTES WHERE noteid = #{noteId}")
-    boolean deleteNote(int noteId);
+    @Delete("DELETE FROM NOTES WHERE noteid = #{noteId} AND userid = #{userId}")
+    boolean deleteNote(int noteId, int userId);
 
 }

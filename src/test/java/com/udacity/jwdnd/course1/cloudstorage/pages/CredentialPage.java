@@ -65,9 +65,9 @@ public class CredentialPage extends HomePage {
     }
 
     public CredentialDTO getLastCredentials() {
-        wait.until(ExpectedConditions.visibilityOf(lastUrlCell));
-        wait.until(ExpectedConditions.visibilityOf(lastUsernameCell));
-        wait.until(ExpectedConditions.visibilityOf(lastPasswordCell));
+        wait.until(ExpectedConditions.elementToBeClickable(lastUrlCell));
+        wait.until(ExpectedConditions.elementToBeClickable(lastUsernameCell));
+        wait.until(ExpectedConditions.elementToBeClickable(lastPasswordCell));
 
         String url = lastUrlCell.getText();
         String username = lastUsernameCell.getText();

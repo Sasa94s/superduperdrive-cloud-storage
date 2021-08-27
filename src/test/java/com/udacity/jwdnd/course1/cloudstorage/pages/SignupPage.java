@@ -4,9 +4,14 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.util.List;
 
 public class SignupPage {
 
+    private final WebDriverWait wait;
     @FindBy(xpath = "/html/body/div/h1")
     public WebElement mainHeading;
 
@@ -25,13 +30,14 @@ public class SignupPage {
     @FindBy(xpath = "/html/body/div/form/button")
     private WebElement signupButton;
 
-    @FindBy(xpath = "/html/body/div/form/div[1]")
-    public WebElement successAlert;
+    @FindBy(xpath = "//*[@id=\"signup-success\"]")
+    public List<WebElement> successAlert;
 
-    @FindBy(xpath = "/html/body/div/form/div[1]/span")
-    public WebElement errorAlert;
+    @FindBy(xpath = "//*[@id=\"signup-error\"]")
+    public List<WebElement> errorAlert;
 
     public SignupPage(WebDriver driver) {
+        this.wait = new WebDriverWait(driver, 10);
         PageFactory.initElements(driver, this);
     }
 
@@ -49,7 +55,10 @@ public class SignupPage {
     }
 
     public boolean signupStatus() {
-        return successAlert.getText().contains("You successfully signed up!")
-                && !errorAlert.isDisplayed();
+        if (successAlert.size() != 0) {
+            return successAlert.get(0).getText().contains("You successfully signed up!");
+        }
+
+        return false;
     }
 }

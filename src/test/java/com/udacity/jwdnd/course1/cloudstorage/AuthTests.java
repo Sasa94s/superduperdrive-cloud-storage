@@ -47,6 +47,7 @@ class AuthTests {
 	}
 
 	@Test
+	@Order(2)
 	public void getLoginPage() {
 		LoginPage loginPage = router.loginPage();
 		Assertions.assertEquals("Login", driver.getTitle());
@@ -73,7 +74,8 @@ class AuthTests {
 				user.getUsername(),
 				user.getPassword()
 		);
-		Assertions.assertTrue(signupPage.signupStatus(), signupPage.errorAlert.getText());
+		Assertions.assertTrue(signupPage.signupStatus(),
+				signupPage.errorAlert.size() != 0 ? signupPage.errorAlert.get(0).getText() : "Alert not found");
 		LoginPage loginPage = router.loginPage();
 		loginPage.login(
 				user.getUsername(),
